@@ -1,0 +1,37 @@
+version: 2.1
+
+jobs:
+  build:
+    working_directory: ~/dataspace-jspui
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch
+    steps:
+      - checkout
+      - restore_cache:
+          key: circleci-dataspace-jspui-{{ checksum "pom.xml" }}
+      - run:
+          name: Download the DSpace 5.5 source
+          command: |
+            if [[ ! -f dspace-parent/dspace-5.5-src-release.zip ]]; then
+              cd dspace-parent && wget "https://github.com/DSpace/DSpace/releases/download/dspace-5.5/dspace-5.5-src-release.zip"
+            fi
+      - run:
+          name: Unzip the DSpace 5.5 source
+          command: |
+            if [[ ! -d dspace-parent/dspace-5.5-src-release ]]; then
+              cd dspace-parent && unzip dspace-5.5-src-release.zip
+            fi
+      - run: mvn dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/dataspace-jspui/dspace-parent
+            - ~/dataspace-jspui/target
+          key: circleci-dataspace-jspui-{{ checksum "pom.xml" }}
+      - run: mvn validate
+      - run: mvn dependency:go-offline
+
+workflows:
+  maven_test:
+    jobs:
+      - build

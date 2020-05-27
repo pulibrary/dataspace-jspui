@@ -13,13 +13,13 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>5.5-SNAPSHOT</version>
-      <relativePath>..</relativePath>
+      <version>5.5</version>
+      <relativePath>./dspace-parent/dspace-5.5-src-release</relativePath>
    </parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
-        <root.basedir>${basedir}/..</root.basedir>
+        <root.basedir>${basedir}/dspace-parent/dspace-5.5-src-release</root.basedir>
     </properties>
 
     <build>
