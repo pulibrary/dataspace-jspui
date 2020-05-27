@@ -1,0 +1,25 @@
+version: 2.1
+
+jobs:
+  build:
+    working_directory: ~/dataspace-jspui
+
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch
+
+    steps:
+      - checkout
+      - restore_cache:
+          key: circleci-dataspace-jspui-{{ checksum "pom.xml" }}
+      - run: mvn dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/dataspace-jspui/target
+          key: circleci-dataspace-jspui-{{ checksum "pom.xml" }}
+      - run: mvn package
+
+workflows:
+  maven_test:
+    jobs:
+      - build
