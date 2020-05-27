@@ -11,10 +11,16 @@ jobs:
           key: circleci-dataspace-jspui-{{ checksum "pom.xml" }}
       - run:
           name: Download the DSpace 5.5 source
-          command: stat dspace-parent/dspace-5.5-src-release.zip | cd dspace-parent && wget "https://github.com/DSpace/DSpace/releases/download/dspace-5.5/dspace-5.5-src-release.zip"
+          command: |
+            if [[ ! -f dspace-parent/dspace-5.5-src-release.zip ]]; then
+              cd dspace-parent && wget "https://github.com/DSpace/DSpace/releases/download/dspace-5.5/dspace-5.5-src-release.zip"
+            fi
       - run:
           name: Unzip the DSpace 5.5 source
-          command: stat dspace-parent/dspace-5.5-src-release | cd dspace-parent && unzip dspace-5.5-src-release.zip
+          command: |
+            if [[ ! -d dspace-parent/dspace-5.5-src-release ]]; then
+              cd dspace-parent && unzip dspace-5.5-src-release.zip
+            fi
       - run: mvn dependency:go-offline
       - save_cache:
           paths:
