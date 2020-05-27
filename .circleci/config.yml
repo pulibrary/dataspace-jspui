@@ -28,8 +28,8 @@ jobs:
             - ~/dataspace-jspui/dspace-parent
             - ~/dataspace-jspui/target
           key: circleci-dataspace-jspui-{{ checksum "pom.xml" }}
+      - run: mvn validate
       - run: mvn dependency:go-offline
-      - run: mvn package
 
 workflows:
   maven_test:
