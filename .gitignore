@@ -1,4 +1,6 @@
 target/
 *.iml
 .idea/
+dspace-parent/dspace-5.5-src-release.zip
+dspace-parent/dspace-5.5-src-release/
 
