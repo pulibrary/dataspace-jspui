@@ -1,0 +1,265 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+.banner img {background-color: #FFFFFF;padding:15px;margin:20px;}
+.brand {padding-top: 30px;}
+.brand h4 {color: #999999}
+ol.breadcrumb li {color: white; font-style: italic;}
+ol.breadcrumb li a {color: white; font-weight: bold; font-style: normal;}
+body.undernavigation {overflow-x: hidden; padding-top: 65px;}
+#content {padding-bottom:60px;}
+#designedby {padding: 5px;}
+#footer_feedback {padding-top: 12px;}
+input[type="file"] {display: block;height: auto;}
+div.panel-primary div.panel-heading a {color: white;}
+/* This magic gets the 16x16 icon to show up.. setting height/width didn't
+   do it, but adding padding actually made it show up. */
+img.ds-authority-confidence,
+span.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 5px; background-repeat: no-repeat;
+  padding: 0px 2px; vertical-align: bottom; color: transparent;}
+img.ds-authority-confidence.cf-unset,
+span.ds-authority-confidence.cf-unset
+  { background-image: url(../../../image/authority/bug.png);}
+img.ds-authority-confidence.cf-novalue,
+span.ds-authority-confidence.cf-novalue
+  { background-image: url(../../../image/confidence/0-unauthored.gif);}
+img.ds-authority-confidence.cf-rejected,
+img.ds-authority-confidence.cf-failed,
+span.ds-authority-confidence.cf-rejected,
+span.ds-authority-confidence.cf-failed
+  { background-image: url(../../../image/confidence/2-errortriangle.gif); }
+img.ds-authority-confidence.cf-notfound,
+span.ds-authority-confidence.cf-notfound
+  { background-image: url(../../../image/confidence/3-thumb1.gif); }
+img.ds-authority-confidence.cf-ambiguous,
+span.ds-authority-confidence.cf-ambiguous
+  { background-image: url(../../../image/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-uncertain,
+span.ds-authority-confidence.cf-uncertain
+  { background-image: url(../../../image/confidence/5-pinion.gif); }
+img.ds-authority-confidence.cf-accepted,
+span.ds-authority-confidence.cf-accepted
+  { background-image: url(../../../image/confidence/6-greencheck.gif); }
+
+/* hide authority-value inputs in forms */
+input.ds-authority-value { display:none; }
+
+/** XXX Change to this to get the authority value to show up for debugging:
+ input.ds-authority-value { display:inline; }
+**/
+
+/* for edit-item-form lock button */
+input.ds-authority-lock
+  { vertical-align: bottom; height: 24px; width: 24px; margin-right: 8px;
+    background-repeat: no-repeat; background-color: transparent; }
+input.ds-authority-lock.is-locked
+  { background-image: url(../../../image/lock24.png); }
+input.ds-authority-lock.is-unlocked
+  { background-image: url(../../../image/unlock24.png); }
+
+/* field required in submission */
+.label-required:after { content:" *"; }
+.browse_range { text-align: center; }
+.prev-next-links { text-align: center; }
+
+div.tagcloud {
+	width:100%;
+	text-align:center
+}
+
+div.tagcloud .tagcloud_1{
+	color: rgb(217, 108, 39); 
+	font-weight: normal; 
+	margin-right: 5px;
+}
+
+div.tagcloud .tagcloud_2{
+	color: rgb(66, 66, 66); 
+	font-weight: normal; 
+	margin-right: 5px;
+}
+
+div.tagcloud .tagcloud_3{
+	color: rgb(129, 129, 131); 
+	font-weight: normal; 
+	margin-right: 5px;
+}
+
+div.batchimport-info {
+	color: gray;
+}
+
+div.batchimport-info  a {
+	color:#47a447; 
+	font-weight: bold;
+}
+
+span.batchimport-error-tab {
+	padding-left:10px;
+}
+
+span.batchimport-error-caused {
+	font-weight:bold;
+}
+
+
+.statisticsLink {
+	display: none;
+}
+
+.loggedin .statisticsLink {
+	display: inline;
+}
+
+/* change this to none in production */
+div.debug {
+    display: block;
+}
+
+.sidebar .debug {
+    display: none;
+}
+
+
+.navbar-brand {
+	height: 25px;
+ }
+
+.navbar-dspace { 
+  background-image: -webkit-gradient(linear, left 0%, left 100%, from(#cc5511), to(#FD8102));
+  background-image: -webkit-linear-gradient(top, #CC5511 0%, #FD8102 100%);
+  background-image: -moz-linear-gradient(top, #CC5511 0%, #FD8102 100%);
+  background-image: linear-gradient(to bottom, #CC5511 0%, #FD8102 100%);
+}
+.navbar-admin { 
+  background-image: -webkit-gradient(linear, left 0%, left 100%, from(#3c3c3c), to(#222222));
+  background-image: -webkit-linear-gradient(top, #3c3c3c 0%, #222222 100%);
+  background-image: -moz-linear-gradient(top, #3c3c3c 0%, #222222 100%);
+  background-image: linear-gradient(to bottom, #3c3c3c 0%, #222222 100%);
+}
+
+.qa .navbar-dspace {
+    background-image: -webkit-gradient(linear, left 0%, left 100%, from(#1954cc), to(#317afd));
+    background-image: -webkit-linear-gradient(top, #1954cc 0%, #317afd 100%);
+    background-image: -moz-linear-gradient(top, #1954cc 0%, #317afd 100%);
+    background-image: linear-gradient(to bottom, #1954cc 0%, #317afd 100%);
+}
+
+.issue .navbar-dspace {
+    background-image: linear-gradient(to bottom, #5cb85c 0px, #449d44 100%);
+    background-repeat: repeat-x;
+    border-color: #419641;
+}
+
+.navbar-dspace a, .navbar-admin a, .navbar a {
+  color: white;
+}
+
+
+.main {
+  padding-left: 0px;
+}
+
+.sidebar {
+  padding-right: 0px;
+}
+
+.sidebar > div {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.search-buttons {
+  margin-bottom: 20px;
+}
+
+
+
+/*
+ * hide classyear, certificate, and advisor browse button by default
+ * show other browse buttons by default
+ */
+.browse-buttons .graduation {
+    display: none;
+}
+
+.browse-buttons .certificate {
+    display: none;
+}
+
+.browse-buttons .department {
+    display: none;
+}
+
+.browse-buttons .advisor {
+    display: none;
+}
+
+/*
+ * senior thesis (hdl-88435-dsp019c67wm88m) and
+ * dissertations (hdl-88435-dsp01td96k251d) customizations
+ */
+
+/* browse buttons */
+
+/* hide title browse button in senior thesis and dissertations */
+.hdl-88435-dsp01td96k251d .browse-buttons .title,
+.hdl-88435-dsp019c67wm88m .browse-buttons .title {
+    display: none;
+}
+
+/* show advisor  in senior thesis and dissertations */
+.hdl-88435-dsp01td96k251d .browse-buttons .advisor,
+.hdl-88435-dsp019c67wm88m .browse-buttons .advisor {
+    display: block;
+}
+
+/* show graduation (classyear), certificate in senior thesis */
+.hdl-88435-dsp019c67wm88m .browse-buttons .graduation,
+.hdl-88435-dsp019c67wm88m .browse-buttons .certificate
+{
+    display: block;
+}
+
+
+/* hide subject, date-issued and title browse button on senior thesis pages */
+.hdl-88435-dsp019c67wm88m .browse-buttons .subject,
+.hdl-88435-dsp019c67wm88m .browse-buttons .dateissued,
+.hdl-88435-dsp019c67wm88m .browse-buttons .title {
+    display: none;
+}
+
+
+/* highlight the location field in seniorthesis */
+/* highlight the dc.rights.accessRights in seniorthesis */
+/* highlight the alternate format field in dissertations */
+.hdl-88435-dsp019c67wm88m .itemDisplayTable .pu-location .metadataFieldValue,
+.hdl-88435-dsp019c67wm88m .itemDisplayTable .dc-rights-accessRights .metadataFieldValue,
+.hdl-88435-dsp01td96k251d .itemDisplayTable .dc-relation-isformatof .metadataFieldValue {
+    background-color: #f5f5f5;
+    background-image: linear-gradient(to bottom, #e8e8e8 0px, #f5f5f5 100%);
+    background-repeat: repeat-x;
+}
+
+
+/* hide all browse buttons - these collections/communities have very few items  */
+/* Woodrow Wilson School  dsp01g445cd134 */
+/* Seeger Ctr Hellenistic dsp01h989r3236 */
+/* OIT                    dsp014q77fr339 */
+/* Astrophysical Sciences dsp01k643b120w */
+/* Mechanical and Aerospace Engineering dsp01gf06g506n */
+/* Dept of GeoSciences    dsp012b88qf40b */
+.hdl-88435-dsp01g445cd134 .browse-buttons,
+.hdl-88435-dsp01h989r3236 .browse-buttons,
+.hdl-88435-dsp014q77fr339 .browse-buttons,
+.hdl-88435-dsp01k643b120w .browse-buttons,
+.hdl-88435-dsp01gf06g506n .browse-buttons,
+.hdl-88435-dsp012b88qf40b .browse-buttons  {
+    display: none;
+}
+
