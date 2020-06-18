@@ -206,7 +206,7 @@ public class RequestItemServlet extends DSpaceServlet
 						.getRequestItemAuthor(context, item);
 
                 DSpaceObject obj = HandleManager.resolveToObject(context, handle);
-                String recipientEmail = ConfigurationManager.getProperty(obj, "request.item.recipient");
+                String recipientEmail = ConfigurationManager.getProperty(handle, "request.item.recipient");
                 String recipientEmailName = "Request Item Recipent";
 
 				email.addArgument(reqname);

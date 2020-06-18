@@ -49,6 +49,8 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
+import org.dspace.embargo.EmbargoManager;
+import org.dspace.authorize.AuthorizeException;
 
 /**
  * <P>
@@ -282,11 +284,19 @@ public class ItemTag extends TagSupport
 
             if (style.equals("full"))
             {
-                renderFull();
+                try {
+                  renderFull();
+                } catch (AuthorizeException e) {
+
+                }
             }
             else
             {
-                render();
+                try {
+                  render();
+                } catch (AuthorizeException e) {
+
+                }
             }
         }
         catch (SQLException sqle)
@@ -379,7 +389,7 @@ public class ItemTag extends TagSupport
     /**
      * Render an item in the given style
      */
-    private void render() throws IOException, SQLException, DCInputsReaderException
+    private void render() throws IOException, SQLException, AuthorizeException, DCInputsReaderException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
@@ -388,8 +398,11 @@ public class ItemTag extends TagSupport
         String configLine = styleSelection.getConfigurationForStyle(style);
 
         Bundle[] bundles = item.getBundles("ORIGINAL");
+
+        DCDate embargoTerms = EmbargoManager.getEmbargoTermsAsDate(context, item);
         String tableClasses = "table itemDisplayTable";
-        if (bundles.length >= 1 && bundles[0].isEmbargoed()) {
+
+        if (bundles.length >= 1 && embargoTerms != null) {
             tableClasses = tableClasses + " embargoed";
         }
         if (configLine == null)
@@ -480,10 +493,10 @@ public class ItemTag extends TagSupport
                 String label = null;
 
                 if (!this.style.isEmpty() && !this.style.equals("default")) {
-                    label = I18nUtil.getMessageOrNil("metadata." + this.style + "." + field, context.getCurrentLocale());
+                    label = I18nUtil.getMessage("metadata." + this.style + "." + field, context.getCurrentLocale());
                 }
                 if (null == label) {
-                    label = I18nUtil.getMessageOrNil("metadata." + field, context.getCurrentLocale());
+                    label = I18nUtil.getMessage("metadata." + field, context.getCurrentLocale());
                 }
                 if (null == label) {
                     label = field;
@@ -653,7 +666,7 @@ public class ItemTag extends TagSupport
     /**
      * Render full item record
      */
-    private void renderFull() throws IOException, SQLException
+    private void renderFull() throws IOException, SQLException, AuthorizeException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
@@ -767,7 +780,7 @@ public class ItemTag extends TagSupport
     /**
      * List bitstreams in the item
      */
-    private void listBitstreams() throws IOException
+    private void listBitstreams() throws IOException, AuthorizeException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest) pageContext
@@ -782,6 +795,9 @@ public class ItemTag extends TagSupport
         try
         {
         	Bundle[] bundles = item.getBundles("ORIGINAL");
+
+          Context context = UIUtil.obtainContext(request);
+          DCDate embargoTerms = EmbargoManager.getEmbargoTermsAsDate(context, item);
 
         	boolean filesExist = false;
             
@@ -802,11 +818,11 @@ public class ItemTag extends TagSupport
                             "org.dspace.app.webui.jsptag.ItemTag.files.no")
                             + "</div>");
         	}
-            else if (bundles[0].isEmbargoed())
+            else if (embargoTerms != null)
             {
                 // If the first ORIGINAL bundle is embargoed, then
                 //   display a simple notice. -- Mark Ratliff
-                String email = ConfigurationManager.getProperty(item, "request.item.recipient");
+                String email = ConfigurationManager.getProperty(item.getHandle(), "request.item.recipient");
                 String liftfield = ConfigurationManager.getProperty("embargo.field.lift");
                 String value = item.getMetadata(liftfield);
                 if (value == null)  { value = "unknown"; }
@@ -928,8 +944,6 @@ public class ItemTag extends TagSupport
             	}	
             	else
             	{
-            		Context context = UIUtil
-							.obtainContext(request);
             		boolean showRequestCopy = false;
             		if ("all".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) || 
             				("logged".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) &&
@@ -1076,7 +1090,7 @@ public class ItemTag extends TagSupport
     }
 
     private String requestCopyLink() throws SQLException {
-        return ConfigurationManager.getProperty(item, "request.copy.link");
+        return ConfigurationManager.getProperty(item.getHandle(), "request.copy.link");
     }
 
 

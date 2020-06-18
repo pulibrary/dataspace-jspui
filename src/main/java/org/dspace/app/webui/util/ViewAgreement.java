@@ -77,7 +77,21 @@ public class ViewAgreement
         } else {
             String filename = viewAgreements.agreements.get(obj).agreementFile;
             if (filename != null) {
-                String realFilename = I18nUtil.getAgreementFilename(Locale.getDefault(), filename);
+
+                // This was ported from I18nUtil
+                Locale locale = Locale.getDefault();
+                String realFilename = filename + "_" + locale.getLanguage();
+
+                if (!("".equals(locale.getCountry())))
+                {
+                  realFilename = filename + "_" + locale.getLanguage() + "_" + locale.getCountry();
+
+                  if (!("".equals(locale.getVariant())))
+                  {
+                    realFilename = filename + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_" + locale.getVariant();
+                  }
+                }
+
                 try {
                     FileInputStream fisTargetFile = new FileInputStream(new File(realFilename));
                     theAgreementText = IOUtils.toString(fisTargetFile, "UTF-8");
