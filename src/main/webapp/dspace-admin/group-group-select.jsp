@@ -32,7 +32,7 @@
 
 <%
     Group group = (Group) request.getAttribute("group");
-    Group [] groups =
+    Group [] groups = 
         (Group []) request.getAttribute("groups");
 %>
 
@@ -57,7 +57,7 @@
                         <%  for (int i = 0; i < groups.length; i++) { %>
                             <option value="<%= groups[i].getID()%>">
                                 <%= groups[i].getName()%>
-                        </option>
+                            </option>
                         <%  } %>
                 </select>
                 </div>

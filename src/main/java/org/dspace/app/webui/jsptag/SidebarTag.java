@@ -36,7 +36,7 @@ public class SidebarTag extends BodyTagSupport
                     "Sidebar tag must be in an enclosing Layout tag");
         }
 
-        tag.setSidebar("<div class='sidebar'>\n" + getBodyContent().getString() + "\n</div>");
+        tag.setSidebar(getBodyContent().getString());
 
         return SKIP_BODY;
     }

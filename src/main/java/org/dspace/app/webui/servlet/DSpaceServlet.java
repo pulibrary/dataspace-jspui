@@ -9,8 +9,6 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,9 +20,6 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -69,18 +64,12 @@ public class DSpaceServlet extends HttpServlet
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
-        if (log.isDebugEnabled()) {
-            Logger.getLogger(this.getClass()).debug("doGet");
-        }
         processRequest(request, response);
     }
 
     protected void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
-        if (log.isDebugEnabled()) {
-            Logger.getLogger(this.getClass()).debug("doPost");
-        }
         processRequest(request, response);
     }
 
@@ -144,28 +133,15 @@ public class DSpaceServlet extends HttpServlet
         }
         catch (AuthorizeException ae)
         {
-           /*
-             * somebody logged in
-             * ==> we know user not allowed to do whatever she tried
+            /*
+             * If no user is logged in, we will start authentication, since if
+             * they authenticate, they might be allowed to do what they tried to
+             * do. If someone IS logged in, and we got this exception, we know
+             * they tried to do something they aren't allowed to, so we display
+             * an error in that case.
              */
-            /* nobody logged in && auto.explicit == true
-             * ==> start explicit authentication
-             *  account owners can login and might get their request through
-             *  others get login prompt instead of 403
-             */
-            /* nobody logged in && auto.explicit == false
-             * ==> authenticate error
-             * account owners can try to login in by clicking the 'My DSpace' and ty again
-             * others will get error page
-             */
-            Boolean doexplicit = ConfigurationManager.getBooleanProperty("authentication", "auto.explicit", true);
-            Boolean noAccess = true;
-
-            if (doexplicit && null == context.getCurrentUser() ) {
-                noAccess = Authenticate.startAuthentication(context, request, response);
-            }
-
-            if (noAccess)
+            if (context.getCurrentUser() != null ||
+                Authenticate.startAuthentication(context, request, response))
             {
                 // FIXME: Log the right info?
                 // Log the error
@@ -174,14 +150,6 @@ public class DSpaceServlet extends HttpServlet
 
                 JSPManager.showAuthorizeError(request, response, ae);
             }
-        } catch (Exception e) {
-            // For any other exception report on error page
-            // and log stack trace
-            log.error(LogManager.getHeader(context, "unhandled error", e.toString()), e);
-            // Also email an alert
-            UIUtil.sendAlert(request, e);
-
-            JSPManager.showInternalError(request, response);
         }
         finally
         {
@@ -242,27 +210,6 @@ public class DSpaceServlet extends HttpServlet
     {
         // If this is not overridden, we invoke the raw HttpServlet "doGet" to
         // indicate that POST is not supported by this servlet.
-        if (log.isDebugEnabled()) {
-                    Logger.getLogger(this.getClass()).debug("doDSPost");
-        }
         super.doGet(request, response);
-    }
-
-
-    protected void setDSpaceObjectAndHandle(Context context, HttpServletRequest request, DSpaceObject dso) throws SQLException {
-        if (dso != null && request.getAttribute("dspaceObject") == null) {
-            request.setAttribute("dspaceObject", dso);
-            List<String> handles = new ArrayList<String>();
-            List<String> names  = new ArrayList<String>();
-             while (dso != null) {
-                 if (dso.getType() != Constants.ITEM){
-                     handles.add(dso.getHandle());
-                     names.add(dso.getName());
-                 }
-                 dso = dso.getParentObject();
-             }
-            request.setAttribute("dspaceObject.parents.handles", handles);
-            request.setAttribute("dspaceObject.parents.names", names);
-        }
     }
 }

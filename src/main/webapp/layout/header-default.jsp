@@ -17,29 +17,17 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.List"%>
+<%@ page import="java.util.Enumeration"%>
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.app.util.Util" %>
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.DSpaceObject" %>
-<%@ page import="org.dspace.app.webui.util.JSPManager" %>
-<%@ page import="org.dspace.app.webui.helper.JSPParameter" %>
+<%@ page import="javax.servlet.jsp.jstl.core.*" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
 <%
-    String environment = ConfigurationManager.getProperty("dspace.environment");
-    
-    JSPParameter params = new JSPParameter(request);
-    
     String title = (String) request.getAttribute("dspace.layout.title");
-    String loggedin = request.getAttribute("dspace.current.user") == null ? "" : "loggedin";
-    // Is the logged in user an admin
-    boolean isAdmin = JSPManager.getBooleanAttribute(request, "is.admin");
-
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
-    if (navbar.equals("off")) {
-        navbar = "/layout/navbar-minimal.jsp" ;
-        isAdmin = false;  // don't show admin navbar menu
-    }
+    boolean locbar = ((Boolean) request.getAttribute("dspace.layout.locbar")).booleanValue();
 
     String siteName = ConfigurationManager.getProperty("dspace.name");
     String feedRef = (String)request.getAttribute("dspace.layout.feedref");
@@ -52,20 +40,6 @@
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
     String analyticsKey = ConfigurationManager.getProperty("jspui.google.analytics.key");
-    // use handles of parents as classes on main div
-    // Grab parents from the URL - these should have been picked up
-    // by the HandleServlet
-    String main_classes = "";
-    {
-
-        if (null != request.getAttribute("dspaceObject.parents.handles")) {
-            List<String> handles = (List<String>) request.getAttribute("dspaceObject.parents.handles");
-
-            for (String hdl : handles) {
-                main_classes = main_classes + " hdl-" + hdl.replace('/', '-');
-            }
-        }
-    }
 %>
 
 <!DOCTYPE html>
@@ -75,19 +49,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="Generator" content="<%= generator %>" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta content="IE=edge" http-equiv="X-UA-Compatible">
-
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
-
-        <!-- Princeton University Customization to add rendering of mathematical formulae by MathJAX -->
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script>
-
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -112,46 +78,37 @@
 <%
         }
 %>
-
+        
+	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
-    
+
     <%--Gooogle Analytics recording.--%>
     <%
-        if (analyticsKey != null && analyticsKey.length() > 0) {
-            out.println("<!-- google analytics javascript snippet for '" + analyticsKey + "' -->");
-            if (null != params.currentUser) {
-                out.println("<!-- not tracking analytics when logged in  -->");
-            } else {
-                if (params.isTestInstance()) {
-                    out.println("<!-- tracking analytics in production only  -->");
-                } else {
+    if (analyticsKey != null && analyticsKey.length() > 0)
+    {
     %>
-    <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', '<%= analyticsKey %>']);
-        _gaq.push(['_trackPageview']);
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', '<%= analyticsKey %>']);
+            _gaq.push(['_trackPageview']);
 
-        (function () {
-            var ga = document.createElement('script');
-            ga.type = 'text/javascript';
-            ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(ga, s);
-        })();
-    </script>
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
     <%
-                }
-            }
-        }
-    %>
-    
-    <%
-        if (extraHeadDataLast != null) {
-            out.println(extraHeadDataLast);
-        }
+    }
+    if (extraHeadDataLast != null)
+    { %>
+		<%= extraHeadDataLast %>
+		<%
+		    }
     %>
     
 
@@ -164,28 +121,52 @@
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body class='undernavigation <%= loggedin%> <%= environment %>'>
-    <a class="sr-only" href="#content">Skip navigation</a>
-    <header class="navbar navbar-dspace navbar-fixed-top">
+    <body class="undernavigation">
+<a class="sr-only" href="#content">Skip navigation</a>
+<header class="navbar navbar-inverse navbar-fixed-top">    
+    <%
+    if (!navbar.equals("off"))
+    {
+%>
+            <div class="container">
+                <dspace:include page="<%= navbar %>" />
+            </div>
+<%
+    }
+    else
+    {
+    	%>
         <div class="container">
-            <jsp:include page="<%= navbar %>"/>
+            <dspace:include page="/layout/navbar-minimal.jsp" />
         </div>
-    </header>
+<%    	
+    }
+%>
+</header>
 
-<% if (isAdmin) { %>
-        <div class="navbar">
-        <div class="container">
-            <jsp:include page="/layout/navbar-admin.jsp"/>
+<main id="content" role="main">
+<div class="container banner">
+	<div class="row">
+		<div class="col-md-9 brand">
+		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
+        <fmt:message key="jsp.layout.header-default.brand.description" /> 
         </div>
+        <div class="col-md-3"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />
         </div>
-<% } %>
-
-<main id="content" class="MAIN <%= main_classes%>">
-
-<%-- Location bar --%>
+	</div>
+</div>	
+<br/>
+                <%-- Location bar --%>
+<%
+    if (locbar)
+    {
+%>
 <div class="container">
-    <jsp:include page="/layout/location-bar.jsp" />
-</div>
+                <dspace:include page="/layout/location-bar.jsp" />
+</div>                
+<%
+    }
+%>
 
 
         <%-- Page contents --%>

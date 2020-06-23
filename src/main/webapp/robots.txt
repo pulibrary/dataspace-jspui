@@ -10,12 +10,8 @@ Sitemap: ${dspace.url}/htmlmap
 ##########################
 User-agent: *
 # Disable access to Discovery search and filters
-Disallow: /jspui/discover 
-Disallow: /jspui/simple-search
-Disallow: /jspui/help
-Disallow: /jspui/*?
-# most bitstreams are behind IP protection 
-Disallow: /jspui/bitstream
+Disallow: /discover 
+Disallow: /simple-search
 #
 # Optionally uncomment the following line ONLY if sitemaps are working
 # and you have verified that your site is being indexed correctly.

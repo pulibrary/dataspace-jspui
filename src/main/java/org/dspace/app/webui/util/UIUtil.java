@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.itemmarking.ItemMarkingExtractor;
 import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.util.Util;
-import org.dspace.app.webui.components.TopCommunitiesProcessor;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.browse.BrowseItem;
 import org.dspace.content.Collection;
@@ -71,11 +70,6 @@ public class UIUtil extends Util
      * has authenticated with the system, the current user of the context is set
      * appropriately.
      *
-     * IF the requests context exists but is invalid - also recreate, in addition wipe
-     * out all attributes stored in the requests - this is ugly but should work under
-     * the assumpotion that the context is created at the beginning of processing a request
-     * and before any attributes are set
-     *
      * @param request
      *            the HTTP request
      *
@@ -105,9 +99,9 @@ public class UIUtil extends Util
         Context c = (Context) request.getAttribute("dspace.context");
 
 
-        if (c == null || ! c.isValid())
+        if (c == null)
         {
-            // No context for this request yet or it has been closed before redirection
+            // No context for this request yet
             c = new Context();
             HttpSession session = request.getSession();
 
@@ -161,9 +155,6 @@ public class UIUtil extends Util
 
             // Store the context in the request
             request.setAttribute("dspace.context", c);
-
-            // these are used by navbar  (and home page)
-            TopCommunitiesProcessor.process(request);
         }
 
         // Set the locale to be used

@@ -75,7 +75,22 @@ public class DisplayStatisticsServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
 
-        DSpaceObject dso = (DSpaceObject) request.getAttribute("dspaceObject");
+        DSpaceObject dso = null;
+        String handle = request.getParameter("handle");
+
+        if("".equals(handle) || handle == null)
+        {
+            // We didn't get passed a handle parameter.
+            // That means we're looking at /handle/*/*/statistics
+            // with handle injected as attribute from HandleServlet
+            handle = (String) request.getAttribute("handle");
+
+        }
+
+        if(handle != null)
+        {
+                dso = HandleManager.resolveToObject(context, handle);
+        }
 
         if(dso == null)
         {

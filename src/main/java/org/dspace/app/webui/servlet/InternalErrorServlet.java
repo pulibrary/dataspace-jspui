@@ -8,7 +8,6 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,8 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
 
 /**
  * Servlet for handling an internal server error
@@ -27,7 +24,7 @@ import org.dspace.core.Context;
  * @author Robert Tansley
  * @version $Revision$
  */
-public class InternalErrorServlet extends DSpaceServlet
+public class InternalErrorServlet extends HttpServlet
 {
     /*
      * We don't extend DSpaceServlet in case it's context creation etc. that
@@ -59,4 +56,9 @@ public class InternalErrorServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/error/internal.jsp");
     }
 
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException
+    {
+        doGet(request, response);
+    }
 }

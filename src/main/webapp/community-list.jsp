@@ -73,11 +73,11 @@
 		{
 			out.println(c.getMetadata("short_description"));
 		}
+		out.println("<br>");
         // Get the collections in this community
         Collection[] cols = (Collection[]) collectionMap.get(c.getID());
         if (cols != null && cols.length > 0)
         {
-            out.println("<br>");
             out.println("<ul class=\"media-list\">");
             for (int j = 0; j < cols.length; j++)
             {

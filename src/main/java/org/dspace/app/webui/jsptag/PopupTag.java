@@ -84,7 +84,14 @@ public class PopupTag extends BodyTagSupport
         HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
         String actualPage = hrq.getContextPath() + page;
 
-        String html = "<a href=\"" + actualPage + "\" target=\"dspacepopup\">" + linkText + "</a>";
+        String html = "<script type=\"text/javascript\">\n"
+                + "<!-- Javascript starts here\n"
+                + "document.write('<a href=\"#\" onClick=\"var popupwin = window.open(\\'"
+                + actualPage
+                + "\\',\\'dspacepopup\\',\\'height=600,width=550,resizable,scrollbars\\');popupwin.focus();return false;\">"
+                + linkText + "<\\/a>');\n" + "// -->\n"
+                + "</script><noscript><a href=\"" + actualPage
+                + "\" target=\"dspacepopup\">" + linkText + "</a></noscript>";
 
         try
         {

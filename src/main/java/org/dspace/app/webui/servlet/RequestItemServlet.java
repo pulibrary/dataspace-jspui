@@ -15,7 +15,10 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.RequestItemManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Metadatum;
+import org.dspace.content.Item;
 import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
@@ -204,10 +207,11 @@ public class RequestItemServlet extends DSpaceServlet
 								RequestItemAuthorExtractor.class.getName(),
 								RequestItemAuthorExtractor.class)
 						.getRequestItemAuthor(context, item);
-
-                DSpaceObject obj = HandleManager.resolveToObject(context, handle);
-                String recipientEmail = ConfigurationManager.getProperty(handle, "request.item.recipient");
-                String recipientEmailName = "Request Item Recipent";
+				
+				String authorEmail = author.getEmail();
+				String authorName = author.getFullName();
+				
+				email.addRecipient(authorEmail);
 
 				email.addArgument(reqname);
 				email.addArgument(requesterEmail);
@@ -222,21 +226,20 @@ public class RequestItemServlet extends DSpaceServlet
 						bitstream_id, item.getID(), requesterEmail, reqname,
 						allfiles));
 				
-				email.addArgument(recipientEmailName);
-                email.addArgument(recipientEmail);
+				email.addArgument(authorName); // corresponding author name
+				email.addArgument(authorEmail); // corresponding author email
 				email.addArgument(ConfigurationManager
 						.getProperty("dspace.name"));
 				email.addArgument(ConfigurationManager
 						.getProperty("mail.helpdesk"));
 				email.setReplyTo(requesterEmail);
-                email.addRecipient(recipientEmail);
-                email.send();
+				email.send();
 
                 log.info(LogManager.getHeader(context,
                     "sent_email_requestItem",
                     "submitter_id=" + requesterEmail
                         + ",bitstream_id="+bitstream_id
-                        + ",recipientEmail="+recipientEmail));
+                        + ",requestEmail="+requesterEmail));
 
                 request.setAttribute("handle", handle);
                 JSPManager.showJSP(request, response,

@@ -22,15 +22,8 @@
     <%-- <h1>Logged Out</h1> --%>
     <h1><fmt:message key="jsp.login.logged-out.title"/></h1>
 
-    <%-- <p>Thank you for remembering to end your session.  Your session with the
-            DataSpace server has been terminated.  However, you are still logged
-            in to CAS, meaning that you can access CAS enabled services (including
-            this one) without having to supply your netID and password.</p> --%>
-    <p><fmt:message key="jsp.login.logged-out.thank">
-    <fmt:param><%= org.dspace.authenticate.CASAuthentication.logoutPageURL() %></fmt:param>
-    </fmt:message>
-    </p>
-
+    <%-- <p>Thank you for remembering to log out!</p> --%>
+    <p><fmt:message key="jsp.login.logged-out.thank"/></p>
     <%-- <p><a href="<%= request.getContextPath() %>/">Go to DSpace Home</a></p> --%>
     <p><a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a></p>
 

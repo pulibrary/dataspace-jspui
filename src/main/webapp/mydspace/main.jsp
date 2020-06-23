@@ -188,14 +188,6 @@
                 pooled[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
-
-            String authorNames = "";
-            Metadatum[] authors =
-                    pooled[i].getItem().getDC("contributor", "author", Item.ANY);
-            for (int ai = 0; ai < authors.length; ai++) {
-                authorNames = authorNames + ", " + authors[ai].value;
-            }
-
             EPerson submitter = pooled[i].getItem().getSubmitter();
 %>
         <tr>
@@ -209,7 +201,7 @@
             }
 %>
                     </td>
-                    <td headers="t7" class="<%= row %>RowEvenCol"><%= Utils.addEntities(title + authorNames) %></td>
+                    <td headers="t7" class="<%= row %>RowEvenCol"><%= Utils.addEntities(title) %></td>
                     <td headers="t8" class="<%= row %>RowOddCol"><%= pooled[i].getCollection().getMetadata("name") %></td>
                     <td headers="t9" class="<%= row %>RowEvenCol"><a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a></td>
                     <td class="<%= row %>RowOddCol">

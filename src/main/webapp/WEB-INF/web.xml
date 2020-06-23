@@ -127,11 +127,7 @@
   </filter-mapping>
  
 
-  <!--
-       DSpace Kernel startup listener. This listener is in charge of initializing/starting the
-       DSpace Kernel. It MUST be listed BEFORE any other DSpace listeners, as DSpace services
-       will not function until the Kernel is initialized.
-  -->
+  <!-- kernel start listener (from impl), starts up the kernel for standalong webapps -->
   <listener>
      <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
   </listener>
@@ -295,12 +291,7 @@
     <servlet-class>org.dspace.app.webui.servlet.InternalErrorServlet</servlet-class>
   </servlet>
 
-    <servlet>
-        <servlet-name>about-jsp</servlet-name>
-        <jsp-file>/about.jsp</jsp-file>
-    </servlet>
-
-    <servlet>
+  <servlet>
     <servlet-name>logout</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.LogoutServlet</servlet-class>
   </servlet>
@@ -520,11 +511,6 @@
     <servlet-name>exportdownload</servlet-name>
     <url-pattern>/exportdownload/*</url-pattern>
   </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>about-jsp</servlet-name>
-        <url-pattern>/about</url-pattern>
-    </servlet-mapping>
 
         <servlet-mapping>
                 <servlet-name>browse</servlet-name>

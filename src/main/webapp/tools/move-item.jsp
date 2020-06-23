@@ -15,10 +15,6 @@
 <%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.dspace.eperson.Group" %>
-<%@ page import="java.util.TreeMap" %>
-<%@ page import="java.util.Map" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -27,13 +23,6 @@
 	Collection [] linkedCollections = (Collection[] )request.getAttribute("linkedCollections");
 	
 	Item item = (Item)request.getAttribute("item");
-	HashMap<String, Collection>  string2Coll = new HashMap<String, Collection>();
-	
-	TreeMap<String, Collection> sortedCollChoices = new TreeMap<String, Collection>();
-	for ( Collection c : notLinkedCollections) {
-		sortedCollChoices.put(c.getParentObject().getName() + " > " + c.getName(), c);
-	}
-	
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.move-item.title">
@@ -68,10 +57,10 @@
 			<select class="form-control" name="collection_to_id">
 <%
 		//Later on find a away to display in a tree format with the linked one disabled?
-        for (Map.Entry<String, Collection> e : sortedCollChoices.entrySet())
+        for (int i = 0; i < notLinkedCollections.length; i++)
         {
 %>
-            <option value="<%= e.getValue().getID() %>"><%= e.getKey() %></option>
+            <option value="<%= notLinkedCollections[i].getID() %>"><%= notLinkedCollections[i].getMetadata("name") %></option>
 <%
         }
 %>

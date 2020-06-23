@@ -23,32 +23,38 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
-
+  
 <%@ page import="java.util.List" %>
-    <%
-        List<String> handles,  names;
-        handles = (List<String>) request.getAttribute("dspaceObject.parents.handles");
-        names = (List<String>) request.getAttribute("dspaceObject.parents.names");
-
-        if (handles != null && ! handles.isEmpty()) {
-
-    %>
-    <ol class="breadcrumb btn-success">
-        <li>
-                <a href="<%= request.getContextPath() %>">
-                <span class="glyphicon glyphicon-home"> </span>
-            </a>
-        </li>
-
-    <%
-            for (int i = handles.size() -1; i>=0;  i--) {
-                String path = request.getContextPath() + "/handle/" + handles.get(i);
-                String name = names.get(i);
-                %>   <li><a href="<%= path %>"><%= name %></a></li> <%
-            }
-    %>
-
-    </ol>
+<ol class="breadcrumb btn-success">
 <%
-    }
+    List parentTitles = (List) request.getAttribute("dspace.layout.parenttitles");
+    List parentLinks = (List) request.getAttribute("dspace.layout.parentlinks");
+
+    for (int i = 0; i < parentTitles.size(); i++)
+    {
+        String s = (String) parentTitles.get(i);
+        String u = (String) parentLinks.get(i);
+
+        if (u.equals(""))
+        {
+            if (i == parentTitles.size())
+            {
 %>
+<li class="active"><%= s %></li>
+<%           
+            }
+            else
+            {
+%>
+<li><%= s %></li>
+<%			}
+        }
+        else
+        {
+%>
+  <li><a href="<%= request.getContextPath() %><%= u %>"><%= s %></a></li>
+<%
+        }
+}
+%>
+</ol>

@@ -27,12 +27,10 @@
 
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
-<%@ page import="org.dspace.app.webui.util.JSPManager" %>
-<%@ page import="java.util.SortedMap" %>
-<%@ page import="java.util.Map" %>
 
 <%
-    SortedMap<String, Group> groups = JSPManager.getGroupAttribute(request, "groups");
+    Group[] groups =
+        (Group[]) request.getAttribute("groups");
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.group-list.title"
@@ -67,36 +65,34 @@
         </tr>
 
 <%
-    String modeString[] = { "even", "odd" };
-    int  mode = 1;
-    for (Map.Entry<String,Group> e : groups.entrySet()) {
-        mode = 1 - mode;
-        String row = modeString[mode];
+    String row = "even";
+    for (int i = 0; i < groups.length; i++)
+    {
 %>
             <tr>
-                <td class="<%= row %>RowOddCol"><%= e.getValue().getID() %></td>
+                <td class="<%= row %>RowOddCol"><%= groups[i].getID() %></td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= e.getValue().getName() %>
+                    <%= groups[i].getName() %>
                 </td>
                 <td class="<%= row %>RowOddCol">
 <%
 	// no edit button for group anonymous
-	if (e.getValue().getID() > 0 )
+	if (groups[i].getID() > 0 )
 	{
-%>
+%>                  
                     <form method="post" action="">
-                        <input type="hidden" name="group_id" value="<%= e.getValue().getID() %>"/>
+                        <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
   		        <input class="btn btn-default col-md-6" type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>" />
                    </form>
 <%
 	}
 
 	// no delete button for group Anonymous 0 and Administrator 1 to avoid accidental deletion
-	if (e.getValue().getID() > 1 )
+	if (groups[i].getID() > 1 )
 	{
 %>   
                     <form method="post" action="">
-                        <input type="hidden" name="group_id" value="<%= e.getValue().getID() %>"/>
+                        <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
 	                <input class="btn btn-danger col-md-6" type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.general.delete"/>" />
 <%
 	}
@@ -105,6 +101,7 @@
                 </td>
             </tr>
 <%
+        row = (row.equals("odd") ? "even" : "odd");
     }
 %>
     </table>

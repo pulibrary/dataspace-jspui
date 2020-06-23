@@ -22,10 +22,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.app.webui.servlet.RequestItemServlet"%>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
 	request.setCharacterEncoding("UTF-8");
-
+	
     boolean problem = (request.getAttribute("requestItem.problem") != null);
 
     String email = (String) request.getAttribute("email");
@@ -47,21 +48,17 @@
     String coment = (String) request.getAttribute("coment");
     if (coment == null)
         coment = "";
-
+    
     String bitstream_id = (String) request.getAttribute("bitstream-id");
+    boolean allfiles = (request.getAttribute("allfiles") != null);
 
 %>
 
 <dspace:layout locbar="off" navbar="default" titlekey="jsp.request.item.request-form.title" >
 
-<h2>Request Documents </h2>
-
-    <p>
-        Please provide your name, email address and a brief message regarding the item that you are requesting.
-        The collection administrator will respond to your request.
-    </p>
-
-<p>
+<h2><fmt:message key="jsp.request.item.request-form.info2">
+<fmt:param><a href="<%=request.getContextPath()%>/handle/<%=handle %>"><%=title %></a></fmt:param>
+</fmt:message></h2>
 
 <%
     	if (problem)
@@ -73,15 +70,28 @@
 %>
     <form name="form1" class="form-horizontal" action="<%= request.getContextPath() %>/request-item" method="post">
 		<div class="form-group">
-         <label for="reqname" class="control-label col-md-2">Your Name:</label>
+         <label for="reqname" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.reqname"/></label>
          <div class="col-md-10">
          	<input class="form-control" type="text" name="reqname" size="50" value="<%= userName %>">
          </div>
         </div>
         <div class="form-group">
-         <label for="email" class="control-label col-md-2">Your Email:</label>
+         <label for="email" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.email"/></label>
          <div class="col-md-10">
 			<input type="text" class="form-control" name="email" size="50" value="<%= email %>">
+         </div>
+        </div>
+        <div class="form-group">
+         <label for="allfiles" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.allfiles"/></label>
+         <div class="col-md-10">
+	        <div class="input-group"> 
+	         <span class="input-group-addon"><input type="radio" name="allfiles" value="true" <%=allfiles?"checked":""%> /></span>
+	         <span class="form-control"><fmt:message key="jsp.request.item.request-form.yes"/></span>
+	        </div>
+	        <div class="input-group">
+	         <span class="input-group-addon"><input type="radio" name="allfiles" value="false" <%=allfiles?"":"checked"%> /></span>
+	         <span class="form-control"><fmt:message key="jsp.request.item.request-form.no"/></span>
+	        </div> 
          </div>
         </div>
         <div class="form-group">
@@ -99,6 +109,5 @@
          <button type="submit" name="submit" class="btn btn-primary col-md-6" value="true"><fmt:message key="jsp.request.item.request-form.go"/></button>
         </div> 
     </form>
-</p>
 
 </dspace:layout>

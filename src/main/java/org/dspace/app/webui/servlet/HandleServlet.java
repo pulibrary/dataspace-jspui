@@ -136,13 +136,12 @@ public class HandleServlet extends DSpaceServlet
             return;
         }
 
-        setDSpaceObjectAndHandle(context, request, dso);
-
         if("/statistics".equals(extraPathInfo))
         {
             // Check configuration properties, auth, etc.
             // Inject handle attribute
             log.info(LogManager.getHeader(context, "display_statistics", "handle=" + handle + ", path=" + extraPathInfo));
+            request.setAttribute("handle", handle);
 
             // Forward to DisplayStatisticsServlet without changing path.
             RequestDispatcher dispatch = getServletContext().getNamedDispatcher("displaystats");

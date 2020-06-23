@@ -8,8 +8,6 @@
 package org.dspace.app.webui.util;
 
 import java.io.IOException;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.Group;
 
 /**
  * Methods for displaying UI pages to the user.
@@ -38,22 +35,6 @@ public class JSPManager
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPManager.class);
-
-    public static boolean getBooleanAttribute(HttpServletRequest request, String attr)
-    {
-        Boolean b = (Boolean) request.getAttribute(attr);
-        return (b == null) ? false : b.booleanValue();
-    }
-
-    public static SortedMap<String, Group> getGroupAttribute(HttpServletRequest request, String attr)
-    {
-        Group[] groups = (Group[]) request.getAttribute(attr);
-        TreeMap<String, Group> sorted = new TreeMap<>();
-        for ( Group g : groups) {
-            sorted.put(g.getName(), g);
-        }
-        return  sorted;
-    }
 
     /**
      * Forwards control of the request to the display JSP passed in.
@@ -74,14 +55,9 @@ public class JSPManager
             log.debug(LogManager.getHeader((Context) request
                     .getAttribute("dspace.context"), "view_jsp", jsp));
         }
-        try {
-            // For the moment, a simple forward
-            request.getRequestDispatcher(jsp).forward(request, response);
-        } catch (ServletException se) {
-             throw se;
-        } catch (RuntimeException re) {
-            throw new ServletException(re);
-        }
+
+        // For the moment, a simple forward
+        request.getRequestDispatcher(jsp).forward(request, response);
     }
 
     /**

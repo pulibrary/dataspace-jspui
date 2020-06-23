@@ -62,6 +62,8 @@
         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#verify\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
         </h1>
 
+        <p><fmt:message key="jsp.submit.review.info1"/></p>
+
         <div class="alert alert-info"><fmt:message key="jsp.submit.review.info2"/></div>
 
         <p><fmt:message key="jsp.submit.review.info3"/></p>

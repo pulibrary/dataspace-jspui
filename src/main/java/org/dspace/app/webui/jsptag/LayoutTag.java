@@ -140,15 +140,106 @@ public class LayoutTag extends BodyTagSupport
             locbar = "auto";
         }
 
-        if (! locbar.equalsIgnoreCase("off")) {
+        // These lists will contain titles and links to put in the location
+        // bar
+        List<String> parents = new ArrayList<String>();
+        List<String> parentLinks = new ArrayList<String>();
+
+        if (locbar.equalsIgnoreCase("off"))
+        {
+            // No location bar
+            request.setAttribute("dspace.layout.locbar", Boolean.FALSE);
+        }
+        else
+        {
+            // We'll always add "DSpace Home" to the a location bar
+            parents.add(ConfigurationManager.getProperty("dspace.name"));
+
+            if (locbar.equalsIgnoreCase("nolink"))
+            {
+                parentLinks.add("");
+            }
+            else
+            {
+                parentLinks.add("/");
+            }
+
+            // Add other relevant components to the location bar
+            if (locbar.equalsIgnoreCase("link"))
+            {
+                // "link" mode - next thing in location bar is taken from
+                // parameters of tag, with a link
+                if (parentTitle != null)
+                {
+                    parents.add(parentTitle);
+                    parentLinks.add(parentLink);
+                }
+                else if (parentTitleKey != null)
+                {
+                    parents.add(LocaleSupport.getLocalizedMessage(pageContext,
+                            parentTitleKey));
+                    parentLinks.add(parentLink);
+                }
+
+            }
+            else if (locbar.equalsIgnoreCase("commLink"))
+            {
+                // "commLink" mode - show all parent communities
+                Community[] comms = (Community[]) request
+                        .getAttribute("dspace.communities");
+
+                if (comms != null)
+                {
+                    for (int i = 0; i < comms.length; i++)
+                    {
+                        parents.add(comms[i].getMetadata("name"));
+                        parentLinks.add("/handle/" + comms[i].getHandle());
+                    }
+                }
+            }
+            else if (locbar.equalsIgnoreCase("nolink"))
+            {
+                // "nolink" mode - next thing in location bar is taken from
+                // parameters of tag, with no link
+                if (parentTitle != null)
+                {
+                    parents.add(parentTitle);
+                    parentLinks.add("");
+                }
+            }
+            else
+            {
+                // Grab parents from the URL - these should have been picked up
+                // by the HandleServlet
+                Collection col = (Collection) request
+                        .getAttribute("dspace.collection");
+                Community[] comms = (Community[]) request
+                        .getAttribute("dspace.communities");
+
+                if (comms != null)
+                {
+                    for (int i = 0; i < comms.length; i++)
+                    {
+                        parents.add(comms[i].getMetadata("name"));
+                        parentLinks.add("/handle/" + comms[i].getHandle());
+                    }
+
+                    if (col != null)
+                    {
+                        parents.add(col.getMetadata("name"));
+                        parentLinks.add("/handle/" + col.getHandle());
+                    }
+                }
+            }
+
             request.setAttribute("dspace.layout.locbar", Boolean.TRUE);
         }
 
-        request.setAttribute("dspace.layout.parenttitles", "parents-ignored");
-        request.setAttribute("dspace.layout.parentlinks", "parentlinks-ignored");
+        request.setAttribute("dspace.layout.parenttitles", parents);
+        request.setAttribute("dspace.layout.parentlinks", parentLinks);
 
         // Navigation bar: "default" is default :)
-        if (navbar == null || navbar.equals("admin"))
+        if (navbar == null)
         {
             navbar = "default";
         }
@@ -327,6 +418,8 @@ public class LayoutTag extends BodyTagSupport
         sidebar = null;
         navbar = null;
         locbar = null;
+        parentTitle = null;
+        parentLink = null;
         noCache = null;
         feedData = null;
         return EVAL_PAGE;
@@ -411,22 +504,66 @@ public class LayoutTag extends BodyTagSupport
         this.locbar = v;
     }
 
-    /*
-     * used in the original layout jsps - ignored values
+    /**
+     * Get the value of parentTitle.
+     * 
+     * @return Value of parentTitle.
      */
-    public String getParenttitlekey() {
+    public String getParenttitle()
+    {
+        return parentTitle;
+    }
+
+    /**
+     * Set the value of parent.
+     * 
+     * @param v
+     *            Value to assign to parent.
+     */
+    public void setParenttitle(String v)
+    {
+        this.parentTitle = v;
+    }
+
+    /**
+     * get parent title key (from message dictionary)
+     * 
+     * @return Returns the parentTitleKey.
+     */
+    public String getParenttitlekey()
+    {
         return parentTitleKey;
     }
 
-    public void setParenttitlekey(String parentTitleKey) {
-        this.parentTitleKey = "ignore";
+    /**
+     * set parent title key (from message dictionary)
+     * 
+     * @param parentTitleKey The parentTitleKey to set.
+     */
+    public void setParenttitlekey(String parentTitleKey)
+    {
+        this.parentTitleKey = parentTitleKey;
     }
 
-    public void setParentlink(String plink) {
-        this.parentLink = "ignore";
+    /**
+     * Get the value of parentlink.
+     * 
+     * @return Value of parentlink.
+     */
+    public String getParentlink()
+    {
+        return parentLink;
     }
-    public String getParentlink() {
-        return this.parentLink;
+
+    /**
+     * Set the value of parentlink.
+     * 
+     * @param v
+     *            Value to assign to parentlink.
+     */
+    public void setParentlink(String v)
+    {
+        this.parentLink = v;
     }
 
     /**

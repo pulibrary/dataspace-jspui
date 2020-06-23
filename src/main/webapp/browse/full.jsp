@@ -176,12 +176,10 @@
 <dspace:layout titlekey="browse.page-title" navbar="<%=layoutNavbar %>">
 
 	<%-- Build the header (careful use of spacing) --%>
-	<h3>
+	<h2>
 		<fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message key="<%= typeKey %>"/> <%= value %>
-	</h3>
+	</h2>
 
-
-	<% if (bi.getStart() != 1 || bi.getFinish() != bi.getTotal()) { %>
 	<%-- Include the main navigation for all the browse pages --%>
 	<%-- This first part is where we render the standard bits required by both possibly navigations --%>
 	<div id="browse_navigation" class="well text-center">
@@ -265,7 +263,6 @@
 %>
 	</form>
 	</div>
-	<% } %>
 	<%-- End of Navigation Headers --%>
 
 	<%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>

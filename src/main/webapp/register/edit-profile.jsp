@@ -75,7 +75,7 @@
     <form class="form-horizontal" action="<%= request.getContextPath() %>/profile" method="post">
 
         <dspace:include page="/register/profile-form.jsp" />
-        
+
 <%
     // Only show password update section if the user doesn't use
     // certificates

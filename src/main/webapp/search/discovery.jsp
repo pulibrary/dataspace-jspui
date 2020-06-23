@@ -34,7 +34,6 @@
   --%>
 
 <%@page import="org.dspace.core.Utils"%>
-<%@page import="com.coverity.security.Escape"%>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@page import="java.util.HashMap"%>
@@ -61,7 +60,10 @@
 <%@ page import="org.dspace.content.Community"   %>
 <%@ page import="org.dspace.content.Collection"  %>
 <%@ page import="org.dspace.content.Item"        %>
+<%@ page import="org.dspace.search.QueryResults" %>
 <%@ page import="org.dspace.sort.SortOption" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.Set" %>
 <%
     // Get the attributes
     DSpaceObject scope = (DSpaceObject) request.getAttribute("scope" );
@@ -159,15 +161,15 @@
 
 <h2><fmt:message key="jsp.search.title"/></h2>
 
-    <div class="discovery-search-form panel panel-default">
-            <%-- Controls for a repeat search --%>
-        <div class="discovery-query panel-heading">
-            <form action="simple-search" method="get">
-                <label for="tlocation">
-                    <fmt:message key="jsp.search.results.searchin"/>
-                </label>
-                <select name="location" id="tlocation">
-                    <%
+<div class="discovery-search-form panel panel-default">
+    <%-- Controls for a repeat search --%>
+	<div class="discovery-query panel-heading">
+    <form action="simple-search" method="get">
+         <label for="tlocation">
+         	<fmt:message key="jsp.search.results.searchin"/>
+         </label>
+         <select name="location" id="tlocation">
+<%
     if (scope == null)
     {
         // Scope of the search was all of DSpace.  The scope control will list
@@ -196,8 +198,8 @@
 	<p class="lead"><fmt:message key="jsp.search.didyoumean"><fmt:param><a id="spellCheckQuery" data-spell="<%= Utils.addEntities(spellCheckQuery) %>" href="#"><%= spellCheckQuery %></a></fmt:param></fmt:message></p>
 <% } %>                  
                                 <input type="hidden" value="<%= rpp %>" name="rpp" />
-                                <input type="hidden" value="<%= Utils.addEntities(sortedBy) %>" name="sort_by" />
-                                <input type="hidden" value="<%= Utils.addEntities(order) %>" name="order" />
+                                <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
+                                <input type="hidden" value="<%= order %>" name="order" />
 <% if (appliedFilters.size() > 0 ) { %>                                
 		<div class="discovery-search-appliedFilters">
 		<span><fmt:message key="jsp.search.filter.applied" /></span>
@@ -211,7 +213,7 @@
 				<%
 					for (DiscoverySearchFilter searchFilter : availableFilters)
 					{
-					    String fkey = "jsp.search.filter." + Escape.uriParam(searchFilter.getIndexFieldName());
+					    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
 					    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"<% 
 					            if (filter[0].equals(searchFilter.getIndexFieldName()))
 					            {
@@ -222,7 +224,7 @@
 					}
 					if (!found)
 					{
-					    String fkey = "jsp.search.filter." + Escape.uriParam(filter[0]);
+					    String fkey = "jsp.search.filter."+filter[0];
 					    %><option value="<%= Utils.addEntities(filter[0]) %>" selected="selected"><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
@@ -231,7 +233,7 @@
 				<%
 					for (String opt : options)
 					{
-					    String fkey = "jsp.search.filter.op." + Escape.uriParam(opt);
+					    String fkey = "jsp.search.filter.op."+opt;
 					    %><option value="<%= Utils.addEntities(opt) %>"<%= opt.equals(filter[1])?" selected=\"selected\"":"" %>><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
@@ -272,8 +274,8 @@
 		<%
 			for (DiscoverySearchFilter searchFilter : availableFilters)
 			{
-			    String fkey = "jsp.search.filter." + Escape.uriParam(searchFilter.getIndexFieldName());
-			    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"><fmt:message key="<%= fkey %>"/></option><%
+			    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
+			    %><option value="<%= searchFilter.getIndexFieldName() %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
 		</select>
@@ -281,15 +283,15 @@
 		<%
 			for (String opt : options)
 			{
-			    String fkey = "jsp.search.filter.op." + Escape.uriParam(opt);
-			    %><option value="<%= Utils.addEntities(opt) %>"><fmt:message key="<%= fkey %>"/></option><%
+			    String fkey = "jsp.search.filter.op."+opt;
+			    %><option value="<%= opt %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
 		</select>
 		<input type="text" id="filterquery" name="filterquery" size="45" required="required" />
 		<input type="hidden" value="<%= rpp %>" name="rpp" />
-		<input type="hidden" value="<%= Utils.addEntities(sortedBy) %>" name="sort_by" />
-		<input type="hidden" value="<%= Utils.addEntities(order) %>" name="order" />
+		<input type="hidden" value="<%= sortedBy %>" name="sort_by" />
+		<input type="hidden" value="<%= order %>" name="order" />
 		<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.search.filter.add"/>" onclick="return validateFilters()" />
 		</form>
 		</div>        
@@ -336,8 +338,8 @@
                for (String sortBy : sortOptions)
                {
                    String selected = (sortBy.equals(sortedBy) ? "selected=\"selected\"" : "");
-                   String mKey = "search.sort-by." + Utils.addEntities(sortBy);
-                   %> <option value="<%= Utils.addEntities(sortBy) %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
+                   String mKey = "search.sort-by." + sortBy;
+                   %> <option value="<%= sortBy %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
                }
 %>
                </select>
@@ -433,7 +435,7 @@ else if( qResults != null)
     
     // create the URLs accessing the previous and next search result pages
     String baseURL =  request.getContextPath()
-                    + (!searchScope.equals("") ? "/handle/" + searchScope : "")
+                    + (searchScope != "" ? "/handle/" + searchScope : "")
                     + "/simple-search?query="
                     + URLEncoder.encode(query,"UTF-8")
                     + httpFilters
@@ -459,20 +461,18 @@ else if( qResults != null)
 
 %>
 <hr/>
-<div class="row">
+<div class="discovery-result-pagination row container">
 <%
 	long lastHint = qResults.getStart()+qResults.getMaxResults() <= qResults.getTotalSearchResults()?
 	        qResults.getStart()+qResults.getMaxResults():qResults.getTotalSearchResults();
 %>
-    <div class="col-md-3 discovery-result-pagination"> <div class="pagination">
-		<fmt:message key="jsp.search.results.results">
-			<fmt:param><%=qResults.getStart()+1%></fmt:param>
-			<fmt:param><%=lastHint%></fmt:param>
-			<fmt:param><%=qResults.getTotalSearchResults()%></fmt:param>
-			<fmt:param><%=(float) qResults.getSearchTime() / 1000%></fmt:param>
-		</fmt:message>
-	</div> </div>
-	<div class="col-md-9 discovery-result-pagination">
+    <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
+	<div class="alert alert-info"><fmt:message key="jsp.search.results.results">
+        <fmt:param><%=qResults.getStart()+1%></fmt:param>
+        <fmt:param><%=lastHint%></fmt:param>
+        <fmt:param><%=qResults.getTotalSearchResults()%></fmt:param>
+        <fmt:param><%=(float) qResults.getSearchTime() / 1000%></fmt:param>
+    </fmt:message></div>
     <ul class="pagination pull-right">
 	<%
 	if (pageFirst != pageCurrent)
@@ -528,7 +528,6 @@ else if( qResults != null)
 	}
 	%>
 	</ul>
-		</div>
 <!-- give a content to the div -->
 </div>
 <div class="discovery-result-results">
@@ -549,14 +548,14 @@ else if( qResults != null)
 <% if (items.length > 0) { %>
     <div class="panel panel-info">
     <div class="panel-heading"><fmt:message key="jsp.search.results.itemhits"/></div>
-	    <dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
+    <dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
     </div>
 <% } %>
 </div>
 <%-- if the result page is enought long... --%>
 <% if ((communities.length + collections.length + items.length) > 10) {%>
 <%-- show again the navigation info/links --%>
-<div class="discovery-result-pagination row">
+<div class="discovery-result-pagination row container">
     <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
 	<div class="alert alert-info"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>
@@ -667,10 +666,8 @@ else
 	for (DiscoverySearchFilterFacet facetConf : facetsConf)
 	{
 	    String f = facetConf.getIndexFieldName();
-	    if (!showFacets.get(f)) {
-			out.println("<div class='debug'> Facet " + f + " has not entries </div>");
-			continue;
-		}
+	    if (!showFacets.get(f))
+	        continue;
 	    List<FacetResult> facet = qResults.getFacetResult(f);
 	    if (facet.size() == 0)
 	    {
@@ -693,7 +690,7 @@ else
 	        if (idx != limit && !appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 	        {
 	        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
-                + (!searchScope.equals("")?"/handle/"+searchScope:"")
+                + (searchScope!=""?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
                 + "&amp;sort_by=" + sortedBy
@@ -718,7 +715,7 @@ else
 	        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
 	        <% if (currFp > 0) { %>
 	        <a class="pull-left" href="<%= request.getContextPath()
-	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
+	            + (searchScope!=""?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
                 + "&amp;sort_by=" + sortedBy
@@ -730,7 +727,7 @@ else
             <% } %>
             <% if (idx == limit) { %>
             <a href="<%= request.getContextPath()
-	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
+	            + (searchScope!=""?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
                 + "&amp;sort_by=" + sortedBy

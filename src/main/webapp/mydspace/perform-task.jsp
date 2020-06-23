@@ -85,8 +85,7 @@
         workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
-        <!-- APPROVE BUTTON -->
-                    <div class="input-group approve">
+                    <div class="input-group">
                     <%-- <input type="submit" name="submit_approve" value="Approve"> --%>
 					<span class="input-group-addon">
 					<input style="width:150px;" class="btn btn-success" type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.general.approve"/>" />
@@ -102,9 +101,8 @@
     {
         // Must be an editor (step 3)
 %>
-
-        <!-- COMMIT BUTTON -->
-                    <div class="input-group commit">
+                    
+                    <div class="input-group">
 					<span class="input-group-addon">
 					<%-- <input type="submit" name="submit_approve" value="Commit to Archive"> --%>
 					<input style="width:150px;" class="btn btn-success" type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.perform-task.commit.button"/>" />
@@ -122,8 +120,7 @@
         workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
-        <!-- REJECT BUTTON -->
-				<div class="input-group reject">
+				<div class="input-group">
 					<span class="input-group-addon">
                     <input style="width:150px;" class="btn btn-danger" type="submit" name="submit_reject" value="<fmt:message key="jsp.mydspace.general.reject"/>"/>
                     </span>
@@ -143,8 +140,7 @@
         workflowItem.getState() == WorkflowManager.WFSTATE_STEP3)
     {
 %>
-        <!-- EDIT BUTTON -->
-				<div class="input-group edit">
+				<div class="input-group">
 					<span class="input-group-addon">
                     <input style="width:150px;" class="btn btn-primary" type="submit" name="submit_edit" value="<fmt:message key="jsp.mydspace.perform-task.edit.button"/>" />
                     </span>
@@ -157,8 +153,7 @@
 <%
     }
 %>
-        <!-- CANCEL BUTTON -->
-				<div class="input-group taskLater">
+				<div class="input-group">
 					<span class="input-group-addon">
                     <input style="width:150px;" class="btn btn-default" type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.perform-task.later.button"/>" />
                     </span>
@@ -167,9 +162,7 @@
                     <fmt:message key="jsp.mydspace.perform-task.instruct5"/>
                     </span>
                 </div>
-
-        <!-- RETURN TO POOL BUTTON -->
-                <div class="input-group taskReturn">
+                <div class="input-group">
 					<span class="input-group-addon">
                     <input style="width:150px;" class="btn btn-default" type="submit" name="submit_pool" value="<fmt:message key="jsp.mydspace.perform-task.return.button"/>" />
                     </span>

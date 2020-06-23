@@ -56,7 +56,7 @@ public class CommunityListServlet extends DSpaceServlet
 
             log.info(LogManager.getHeader(context, "view_community_list", ""));
 
-            Community[] communities = (Community[]) request.getAttribute("communities");
+            Community[] communities = Community.findAllTop(context);
 
             for (int com = 0; com < communities.length; com++) 
             {
@@ -70,6 +70,7 @@ public class CommunityListServlet extends DSpaceServlet
                 request.setAttribute("admin_button", Boolean.TRUE);
             }
 
+            request.setAttribute("communities", communities);
             request.setAttribute("collections.map", colMap);
             request.setAttribute("subcommunities.map", commMap);
             JSPManager.showJSP(request, response, "/community-list.jsp");

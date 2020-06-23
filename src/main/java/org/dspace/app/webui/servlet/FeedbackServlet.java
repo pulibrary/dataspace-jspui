@@ -67,7 +67,6 @@ public class FeedbackServlet extends DSpaceServlet
 
         if (fromPage == null || fromPage.indexOf(basicHost) == -1)
         {
-            log.warn("Requesting Feedback  from " + fromPage + " for site at " + host); 
             throw new AuthorizeException();
         }
 

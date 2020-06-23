@@ -288,8 +288,14 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         if (scope == null)
         {
             Community[] topCommunities;
-            topCommunities = (Community[]) request.getAttribute("communities");
-
+            try
+            {
+                topCommunities = Community.findAllTop(context);
+            }
+            catch (SQLException e)
+            {
+                throw new SearchProcessorException(e.getMessage(), e);
+            }
             for (Community com : topCommunities)
             {
                 scopes.add(com);

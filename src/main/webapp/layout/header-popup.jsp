@@ -1,5 +1,5 @@
 <%--
-        
+
     The contents of this file are subject to the license and copyright
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
@@ -24,8 +24,6 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
 <%
-    String environment = ConfigurationManager.getProperty("dspace.environment");
-
     String title = (String) request.getAttribute("dspace.layout.title");
 
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
@@ -43,7 +41,6 @@
         <title><%= siteName %>: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="Generator" content="DSpace" />
-        <meta content="IE=edge" http-equiv="X-UA-Compatible">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
@@ -65,7 +62,7 @@
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body class="<%= environment %>">
+    <body>
 
         <%-- Localization --%>
 <%--  <c:if test="${param.locale != null}">--%>

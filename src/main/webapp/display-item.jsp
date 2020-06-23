@@ -35,9 +35,14 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
+<%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="org.dspace.versioning.Version"%>
+<%@page import="org.dspace.core.Context"%>
 <%@page import="org.dspace.app.webui.util.VersionUtil"%>
+<%@page import="org.dspace.app.webui.util.UIUtil"%>
+<%@page import="org.dspace.authorize.AuthorizeManager"%>
 <%@page import="java.util.List"%>
+<%@page import="org.dspace.core.Constants"%>
 <%@page import="org.dspace.eperson.EPerson"%>
 <%@page import="org.dspace.versioning.VersionHistory"%>
 <%
@@ -91,30 +96,22 @@
     boolean newVersionAvailable = (newversionavailableBool!=null && newversionavailableBool.booleanValue());
     Boolean showVersionWorkflowAvailableBool = (Boolean)request.getAttribute("versioning.showversionwfavailable");
     boolean showVersionWorkflowAvailable = (showVersionWorkflowAvailableBool!=null && showVersionWorkflowAvailableBool.booleanValue());
-
-    boolean showStatsLink = admin_button || ConfigurationManager.getBooleanProperty("report.public");
-
+    
     String latestVersionHandle = (String)request.getAttribute("versioning.latestversionhandle");
     String latestVersionURL = (String)request.getAttribute("versioning.latestversionurl");
     
     VersionHistory history = (VersionHistory)request.getAttribute("versioning.history");
     List<Version> historyVersions = (List<Version>)request.getAttribute("versioning.historyversions");
-
-    String main_col_width = "col-md-9";
-    if (workspace_id != null) {
-        main_col_width = "col-md-12";
-    }
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout title="<%= title %>">
-    <!-- ITEM DISPLAY -->
-    <div class="<%= main_col_width %> main">
 <%
     if (handle != null)
     {
 %>
-		<%
+
+		<%		
 		if (newVersionAvailable)
 		   {
 		%>
@@ -124,8 +121,8 @@
 		<%
 		    }
 		%>
-
-		<%
+		
+		<%		
 		if (showVersionWorkflowAvailable)
 		   {
 		%>
@@ -141,6 +138,49 @@
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <div class="well"><fmt:message key="jsp.display-item.identifier"/>
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></div>
+<%
+        if (admin_button)  // admin edit button
+        { %>
+        <dspace:sidebar>
+            <div class="panel panel-warning">
+            	<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
+            	<div class="panel-body">
+                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <%--<input type="submit" name="submit" value="Edit...">--%>
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                </form>
+                <form method="post" action="<%= request.getContextPath() %>/mydspace">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
+                </form>
+                <form method="post" action="<%= request.getContextPath() %>/mydspace">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.migrateitem"/>" />
+                </form>
+                <form method="post" action="<%= request.getContextPath() %>/dspace-admin/metadataexport">
+                    <input type="hidden" name="handle" value="<%= item.getHandle() %>" />
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
+                </form>
+					<% if(hasVersionButton) { %>       
+                	<form method="get" action="<%= request.getContextPath() %>/tools/version">
+                    	<input type="hidden" name="itemID" value="<%= item.getID() %>" />                    
+                    	<input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.button"/>" />
+                	</form>
+                	<% } %> 
+                	<% if(hasVersionHistory) { %>			                
+                	<form method="get" action="<%= request.getContextPath() %>/tools/history">
+                    	<input type="hidden" name="itemID" value="<%= item.getID() %>" />
+                    	<input type="hidden" name="versionID" value="<%= history.getVersion(item)!=null?history.getVersion(item).getVersionId():null %>" />                    
+                    	<input class="btn btn-info col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.history.button"/>" />
+                	</form>         	         	
+					<% } %>
+             </div>
+          </div>
+        </dspace:sidebar>
+<%      } %>
 
 <%
     }
@@ -218,10 +258,8 @@
 <%
         }
 %>
-
-    <% if (showStatsLink) { %>
     <a class="statisticsLink  btn btn-primary" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
-    <% } %>
+
     <%-- SFX Link --%>
 <%
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
@@ -303,64 +341,5 @@
     <p class="submitFormHelp alert alert-info"><fmt:message key="jsp.display-item.copyright"/></p>
 <%
     } 
-%>
-    </div>
-    <!-- END ITEM DISPLAY -->
-
-
-    <div class="col-md-3 sidebar">
-
-        <%
-            if (admin_button)  // admin edit button
-            { %>
-        <div>
-            <div class="panel panel-warning">
-                <div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
-                <div class="panel-body">
-                    <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
-                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                            <%--<input type="submit" name="submit" value="Edit...">--%>
-                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
-                    </form>
-                    <form method="post" action="<%= request.getContextPath() %>/mydspace">
-                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                        <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
-                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
-                    </form>
-                    <form method="post" action="<%= request.getContextPath() %>/mydspace">
-                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                        <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
-                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.migrateitem"/>" />
-                    </form>
-                    <form method="post" action="<%= request.getContextPath() %>/dspace-admin/metadataexport">
-                        <input type="hidden" name="handle" value="<%= item.getHandle() %>" />
-                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
-                    </form>
-                    <% if(hasVersionButton) { %>
-                    <form method="get" action="<%= request.getContextPath() %>/tools/version">
-                        <input type="hidden" name="itemID" value="<%= item.getID() %>" />
-                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.button"/>" />
-                    </form>
-                    <% } %>
-                    <% if(hasVersionHistory) { %>
-                    <form method="get" action="<%= request.getContextPath() %>/tools/history">
-                        <input type="hidden" name="itemID" value="<%= item.getID() %>" />
-                        <input type="hidden" name="versionID" value="<%= history.getVersion(item)!=null?history.getVersion(item).getVersionId():null %>" />
-                        <input class="btn btn-info col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.history.button"/>" />
-                    </form>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-        <%      } %>
-
-        <% if (workspace_id == null) { %>
-
-        <dspace:include page="/components/search-buttons.jsp"/>
-
-        <dspace:include page="/components/browse-buttons.jsp"/>
-
-        <% } %>
-    </div>
-
+%>    
 </dspace:layout>

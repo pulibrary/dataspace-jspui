@@ -24,7 +24,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
   
-<%@ page import="org.dspace.content.DSpaceObject" %>
+<%@ page import="java.util.List" %>
 
 <p class="locationBar">
 <%
@@ -47,7 +47,7 @@
 %>
 <%= s %>&nbsp;&gt;
 <%
-    }
+        }
         else
         {
 %>

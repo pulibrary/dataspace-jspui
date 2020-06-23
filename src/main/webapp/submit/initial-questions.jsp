@@ -68,7 +68,8 @@
 
 <%
 	// Don't display MultipleTitles if no such form box defined
-
+    if (inputSet.isDefinedMultTitles())
+    {
 %>			
 			<div class="input-group">
 				<span class="input-group-addon">
@@ -77,6 +78,10 @@
 				<label class="form-control" for="multiple_titles"><fmt:message key="jsp.submit.initial-questions.elem1"/></label>
 			</div>
 <%
+    }
+    // Don't display PublishedBefore if no form boxes defined
+    if (inputSet.isDefinedPubBefore())
+    {
 %>
 			<div class="input-group">
                 <span class="input-group-addon">
@@ -85,6 +90,10 @@
 				<label class="form-control" for="published_before"><fmt:message key="jsp.submit.initial-questions.elem2"/></label>
 			</div>
 <%
+    }
+    // Don't display file or thesis questions in workflow mode
+    if (!subInfo.isInWorkflow())
+    {
 %>
 			<div class="input-group">
                 <span class="input-group-addon">
@@ -108,6 +117,7 @@
 			</div>		
 <%
         }
+    }
 %>
 <br/>
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>

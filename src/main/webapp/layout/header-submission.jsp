@@ -17,25 +17,17 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.List"%>
+<%@ page import="java.util.Enumeration"%>
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.app.util.Util" %>
-<%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="javax.servlet.jsp.jstl.core.*" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
 <%
-    String environment = ConfigurationManager.getProperty("dspace.environment");
-
     String title = (String) request.getAttribute("dspace.layout.title");
-
-    // Is the logged in user an admin
-    boolean isAdmin =JSPManager.getBooleanAttribute(request, "is.admin");
-
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
-    if ("off".equals(navbar)) {
-        navbar = "/layout/navbar-minimal.jsp" ;
-        isAdmin = false;  // don't show admin navbar menu
-    }
-
-    boolean locbar = JSPManager.getBooleanAttribute(request, "dspace.layout.locbar");
+    boolean locbar = ((Boolean) request.getAttribute("dspace.layout.locbar")).booleanValue();
 
     String siteName = ConfigurationManager.getProperty("dspace.name");
     String feedRef = (String)request.getAttribute("dspace.layout.feedref");
@@ -56,7 +48,6 @@
         <title><%= title %> | <%= siteName %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="Generator" content="<%= generator %>" />
-        <meta content="IE=edge" http-equiv="X-UA-Compatible">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
@@ -130,31 +121,37 @@
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body class="undernavigation <%= environment %>">
+    <body class="undernavigation">
 <a class="sr-only" href="#content">Skip navigation</a>
- <header class="navbar navbar-dspace navbar-fixed-top">
+<header class="navbar navbar-inverse navbar-fixed-top">    
+    <%
+    if (!navbar.equals("off"))
+    {
+%>
+            <div class="container">
+                <dspace:include page="<%= navbar %>" />
+            </div>
+<%
+    }
+    else
+    {
+    	%>
         <div class="container">
-            <jsp:include page="<%= navbar %>"/>
+            <dspace:include page="/layout/navbar-minimal.jsp" />
         </div>
- </header>
+<%    	
+    }
+%>
+</header>
 
-<% if (isAdmin) { %>
-        <div class="navbar">
-        <div class="container">
-            <jsp:include page="/layout/navbar-admin.jsp"/>
-        </div>
-        </div>
-<% } %>
-
-
-<main id="content" class='submission' role="main">
+<main id="content" role="main">
                 <%-- Location bar --%>
 <%
     if (locbar)
     {
 %>
 <div class="container">
-                <jsp:include page="/layout/location-bar.jsp" />
+                <dspace:include page="/layout/location-bar.jsp" />
 </div>                
 <%
     }
@@ -166,4 +163,4 @@
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
 	<div class="row">
 		<div class="col-md-9">
-<% } %>
+<% } %>		

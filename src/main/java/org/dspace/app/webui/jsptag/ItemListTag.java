@@ -454,92 +454,98 @@ public class ItemListTag extends TagSupport
                     }
                     if (metadataArray.length > 0)
                     {
-                        try {
-                            // format the date field correctly
-                            if (isDate[colIdx]) {
-                                DCDate dd = new DCDate(metadataArray[0].value);
-                                metadata = UIUtil.displayDate(dd, false, false, hrq);
+                        // format the date field correctly
+                        if (isDate[colIdx])
+                        {
+                            DCDate dd = new DCDate(metadataArray[0].value);
+                            metadata = UIUtil.displayDate(dd, false, false, hrq);
+                        }
+                        // format the title field correctly for withdrawn items (ie. don't link)
+                        else if (field.equals(titleField) && items[i].isWithdrawn())
+                        {
+                            metadata = Utils.addEntities(metadataArray[0].value);
+                        }
+                        // format the title field correctly
+                        else if (field.equals(titleField))
+                        {
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                            + items[i].getHandle() + "\">"
+                            + Utils.addEntities(metadataArray[0].value)
+                            + "</a>";
+                        }
+                        // format all other fields
+                        else
+                        {
+                            // limit the number of records if this is the author field (if
+                            // -1, then the limit is the full list)
+                            boolean truncated = false;
+                            int loopLimit = metadataArray.length;
+                            if (isAuthor[colIdx])
+                            {
+                                int fieldMax = (authorLimit > 0 ? authorLimit : metadataArray.length);
+                                loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
+                                truncated = (fieldMax < metadataArray.length);
+                                log.debug("Limiting output of field " + field + " to " + Integer.toString(loopLimit) + " from an original " + Integer.toString(metadataArray.length));
                             }
-                            // format the title field correctly for withdrawn items (ie. don't link)
-                            else if (field.equals(titleField) && items[i].isWithdrawn()) {
-                                metadata = Utils.addEntities(metadataArray[0].value);
-                            }
-                            // format the title field correctly
-                            else if (field.equals(titleField)) {
-                                metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
-                                        + items[i].getHandle() + "\">"
-                                        + Utils.addEntities(metadataArray[0].value)
-                                        + "</a>";
-                            }
-                            // format all other fields
-                            else {
-                                // limit the number of records if this is the author field (if
-                                // -1, then the limit is the full list)
-                                boolean truncated = false;
-                                int loopLimit = metadataArray.length;
-                                if (isAuthor[colIdx]) {
-                                    int fieldMax = (authorLimit > 0 ? authorLimit : metadataArray.length);
-                                    loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
-                                    truncated = (fieldMax < metadataArray.length);
-                                    log.debug("Limiting output of field " + field + " to " + Integer.toString(loopLimit) + " from an original " + Integer.toString(metadataArray.length));
-                                }
 
-                                StringBuffer sb = new StringBuffer();
-                                for (int j = 0; j < loopLimit; j++) {
-                                    String startLink = "";
-                                    String endLink = "";
-                                    if (!StringUtils.isEmpty(browseType[colIdx]) && !disableCrossLinks) {
-                                        String argument;
-                                        String value;
-                                        if (metadataArray[j].authority != null &&
-                                                metadataArray[j].confidence >= MetadataAuthorityManager.getManager()
-                                                        .getMinConfidence(metadataArray[j].schema, metadataArray[j].element, metadataArray[j].qualifier)) {
-                                            argument = "authority";
-                                            value = metadataArray[j].authority;
-                                        } else {
-                                            argument = "value";
-                                            value = metadataArray[j].value;
-                                        }
-                                        if (viewFull[colIdx]) {
-                                            argument = "vfocus";
-                                        }
-                                        startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
-                                                argument + "=" + URLEncoder.encode(value, "UTF-8");
-
-                                        if (metadataArray[j].language != null) {
-                                            startLink = startLink + "&amp;" +
-                                                    argument + "_lang=" + URLEncoder.encode(metadataArray[j].language, "UTF-8");
-                                        }
-
-                                        if ("authority".equals(argument)) {
-                                            startLink += "\" class=\"authority " + browseType[colIdx] + "\">";
-                                        } else {
-                                            startLink = startLink + "\">";
-                                        }
-                                        endLink = "</a>";
+                            StringBuffer sb = new StringBuffer();
+                            for (int j = 0; j < loopLimit; j++)
+                            {
+                                String startLink = "";
+                                String endLink = "";
+                                if (!StringUtils.isEmpty(browseType[colIdx]) && !disableCrossLinks)
+                                {
+                                    String argument;
+                                    String value;
+                                    if (metadataArray[j].authority != null &&
+                                            metadataArray[j].confidence >= MetadataAuthorityManager.getManager()
+                                                .getMinConfidence(metadataArray[j].schema, metadataArray[j].element, metadataArray[j].qualifier))
+                                    {
+                                        argument = "authority";
+                                        value = metadataArray[j].authority;
                                     }
-                                    sb.append(startLink);
-                                    sb.append(Utils.addEntities(metadataArray[j].value));
-                                    sb.append(endLink);
-                                    if (j < (loopLimit - 1)) {
-                                        sb.append("; ");
+                                    else
+                                    {
+                                        argument = "value";
+                                        value = metadataArray[j].value;
                                     }
+                                    if (viewFull[colIdx])
+                                    {
+                                        argument = "vfocus";
+                                    }
+                                    startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
+                                        argument + "=" + URLEncoder.encode(value,"UTF-8");
+
+                                    if (metadataArray[j].language != null)
+                                    {
+                                        startLink = startLink + "&amp;" +
+                                            argument + "_lang=" + URLEncoder.encode(metadataArray[j].language, "UTF-8");
+                                    }
+
+                                    if ("authority".equals(argument))
+                                    {
+                                        startLink += "\" class=\"authority " +browseType[colIdx] + "\">";
+                                    }
+                                    else
+                                    {
+                                        startLink = startLink + "\">";
+                                    }
+                                    endLink = "</a>";
                                 }
-                                if (truncated) {
-                                    String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
-                                    sb.append(", ").append(etal);
+                                sb.append(startLink);
+                                sb.append(Utils.addEntities(metadataArray[j].value));
+                                sb.append(endLink);
+                                if (j < (loopLimit - 1))
+                                {
+                                    sb.append("; ");
                                 }
-                                metadata = "<em>" + sb.toString() + "</em>";
                             }
-                        } catch (RuntimeException e) {
-                            // now this is ugly - but if anything goes wrong with the evaluation of the metadata value we simply
-                            // set to the original text value
-                            // and log an error
-                            log.error("Could not convert metadata value to string for " + field + "in item " + items[i]);
-                            metadata = metadataArray[0].value;
-                            if (null == metadata) {
-                                    metadata = "";
+                            if (truncated)
+                            {
+                                String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
+                                sb.append(", ").append(etal);
                             }
+                            metadata = "<em>" + sb.toString() + "</em>";
                         }
                     }
                     //In case title has no value, replace it with "undefined" so as the user has something to

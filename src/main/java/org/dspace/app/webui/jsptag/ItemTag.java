@@ -49,8 +49,6 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
-import org.dspace.embargo.EmbargoManager;
-import org.dspace.authorize.AuthorizeException;
 
 /**
  * <P>
@@ -284,19 +282,11 @@ public class ItemTag extends TagSupport
 
             if (style.equals("full"))
             {
-                try {
-                  renderFull();
-                } catch (AuthorizeException e) {
-
-                }
+                renderFull();
             }
             else
             {
-                try {
-                  render();
-                } catch (AuthorizeException e) {
-
-                }
+                render();
             }
         }
         catch (SQLException sqle)
@@ -389,7 +379,7 @@ public class ItemTag extends TagSupport
     /**
      * Render an item in the given style
      */
-    private void render() throws IOException, SQLException, AuthorizeException, DCInputsReaderException
+    private void render() throws IOException, SQLException, DCInputsReaderException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
@@ -397,20 +387,12 @@ public class ItemTag extends TagSupport
         Locale sessionLocale = UIUtil.getSessionLocale(request);
         String configLine = styleSelection.getConfigurationForStyle(style);
 
-        Bundle[] bundles = item.getBundles("ORIGINAL");
-
-        DCDate embargoTerms = EmbargoManager.getEmbargoTermsAsDate(context, item);
-        String tableClasses = "table itemDisplayTable";
-
-        if (bundles.length >= 1 && embargoTerms != null) {
-            tableClasses = tableClasses + " embargoed";
-        }
         if (configLine == null)
         {
             configLine = defaultFields;
         }
 
-        out.println("<table class='" + tableClasses + "'>");
+        out.println("<table class=\"table itemDisplayTable\">");
 
         /*
          * Break down the configuration into fields and display them
@@ -426,7 +408,6 @@ public class ItemTag extends TagSupport
         	String field = st.nextToken().trim();
             boolean isDate = false;
             boolean isLink = false;
-            boolean isHtml = false;
             boolean isResolver = false;
             boolean isNoBreakLine = false;
             boolean isDisplay = false;
@@ -454,8 +435,7 @@ public class ItemTag extends TagSupport
             {
                 isDate = style.contains("date");
                 isLink = style.contains("link");
-                isHtml = style.equals("html");
-                isNoBreakLine = style.contains("nobreakline");
+				isNoBreakLine = style.contains("nobreakline");
 				isDisplay = style.equals("inputform");
                 isResolver = style.contains("resolver") || urn2baseurl.keySet().contains(style);
                 field = field.replaceAll("\\("+style+"\\)", "");
@@ -487,22 +467,24 @@ public class ItemTag extends TagSupport
             
             if (values.length > 0)
             {
-                String field_class = field.replace('.', '-');
+                out.print("<tr><td class=\"metadataFieldLabel\">");
 
-                out.print("<tr class='" + field_class + "'><td class='metadataFieldLabel'>");
                 String label = null;
-
-                if (!this.style.isEmpty() && !this.style.equals("default")) {
-                    label = I18nUtil.getMessage("metadata." + this.style + "." + field, context.getCurrentLocale());
+                try
+                {
+                    label = I18nUtil.getMessage("metadata."
+                            + ("default".equals(this.style) ? "" : this.style + ".") + field,
+                            context);
                 }
-                if (null == label) {
-                    label = I18nUtil.getMessage("metadata." + field, context.getCurrentLocale());
+                catch (MissingResourceException e)
+                {
+                    // if there is not a specific translation for the style we
+                    // use the default one
+                    label = LocaleSupport.getLocalizedMessage(pageContext,
+                            "metadata." + field);
                 }
-                if (null == label) {
-                    label = field;
-                }
+                
                 out.print(label);
-
                 out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
                 
                 //If the values are in controlled vocabulary and the display value should be shown
@@ -550,21 +532,13 @@ public class ItemTag extends TagSupport
                         {
                             out.print("<a href=\"" + values[j].value + "\">"
                                     + Utils.addEntities(values[j].value) + "</a>");
-                        } else  if (isHtml)
-                        {
-                            out.print(values[j].value);
                         }
                         else if (isDate)
                         {
                             DCDate dd = new DCDate(values[j].value);
-                            String dateString = values[j].value;
-                            try {
-                                dateString = UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest());
-                            } catch (Exception e){
-                                log.warn("Can't format date string '" + values[j].value + "' in item " + item.toString());
-                            }
+
                             // Parse the date
-                            out.print(dateString);
+                            out.print(UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()));
                         }
                         else if (isResolver)
                         {
@@ -666,7 +640,7 @@ public class ItemTag extends TagSupport
     /**
      * Render full item record
      */
-    private void renderFull() throws IOException, SQLException, AuthorizeException
+    private void renderFull() throws IOException, SQLException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
@@ -780,7 +754,7 @@ public class ItemTag extends TagSupport
     /**
      * List bitstreams in the item
      */
-    private void listBitstreams() throws IOException, AuthorizeException
+    private void listBitstreams() throws IOException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest) pageContext
@@ -795,9 +769,6 @@ public class ItemTag extends TagSupport
         try
         {
         	Bundle[] bundles = item.getBundles("ORIGINAL");
-
-          Context context = UIUtil.obtainContext(request);
-          DCDate embargoTerms = EmbargoManager.getEmbargoTermsAsDate(context, item);
 
         	boolean filesExist = false;
             
@@ -818,18 +789,6 @@ public class ItemTag extends TagSupport
                             "org.dspace.app.webui.jsptag.ItemTag.files.no")
                             + "</div>");
         	}
-            else if (embargoTerms != null)
-            {
-                // If the first ORIGINAL bundle is embargoed, then
-                //   display a simple notice. -- Mark Ratliff
-                String email = ConfigurationManager.getProperty(item.getHandle(), "request.item.recipient");
-                String liftfield = ConfigurationManager.getProperty("embargo.field.lift");
-                String value = item.getMetadata(liftfield);
-                if (value == null)  { value = "unknown"; }
-                String [] params =  { value, email, item.getHandle()};
-                String embargo = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.embargo", params);
-                out.println("<div class=\"panel-body\">"+ embargo + "</div>");
-            }
         	else
         	{
         		boolean html = false;
@@ -944,6 +903,8 @@ public class ItemTag extends TagSupport
             	}	
             	else
             	{
+            		Context context = UIUtil
+							.obtainContext(request);
             		boolean showRequestCopy = false;
             		if ("all".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) || 
             				("logged".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) &&
@@ -987,8 +948,11 @@ public class ItemTag extends TagSupport
 
             					out
                                     .print("<tr><td headers=\"t1\" class=\"standard\">");
+                                out.print("<a ");
+            					out.print(bsLink);
             					out.print(bitstreams[k].getName());
-
+                                out.print("</a>");
+                                
 
             					if (multiFile)
             					{
@@ -1037,36 +1001,35 @@ public class ItemTag extends TagSupport
             						}
             					}
 
-                                if (AuthorizeManager .authorizeActionBoolean(context,
-                                        bitstreams[k],
-                                        Constants.READ)) {
-                                    /* show download button */
-                                    out.print("<a class=\"btn btn-primary\" ");
-                                    out.print(bsLink
+            					out.print("<a class=\"btn btn-primary\" ");
+            					out
+                                    .print(bsLink
                                             + LocaleSupport
-                                            .getLocalizedMessage(
-                                                    pageContext,
-                                                    "org.dspace.app.webui.jsptag.ItemTag.view")
+                                                    .getLocalizedMessage(
+                                                            pageContext,
+                                                            "org.dspace.app.webui.jsptag.ItemTag.view")
                                             + "</a>");
-
-                                } else {
-                                    String requestLink = requestCopyLink();
-                                    if (requestLink == null || requestCopyLink().isEmpty()) {
-                                        requestLink = request.getContextPath()
-                                                + "/request-item?handle="
-                                                + handle
-                                                + "&bitstream-id="
-                                                + bitstreams[k].getID();
-                                    }
-                                    /* show request copy button */
-
-                                    out.print("&nbsp;<a class='btn btn-success request_copy' " +
-                                            " href='" + requestLink + "'>" +
-                                            LocaleSupport.getLocalizedMessage( pageContext, "org.dspace.app.webui.jsptag.ItemTag.restrict") +
-                                            "</a>");
-                                }
-
-                                out.print("</td></tr>");
+            					
+								try {
+									if (showRequestCopy && !AuthorizeManager
+											.authorizeActionBoolean(context,
+													bitstreams[k],
+													Constants.READ))
+										out.print("&nbsp;<a class=\"btn btn-success\" href=\""
+												+ request.getContextPath()
+												+ "/request-item?handle="
+												+ handle
+												+ "&bitstream-id="
+												+ bitstreams[k].getID()
+												+ "\">"
+												+ LocaleSupport
+														.getLocalizedMessage(
+																pageContext,
+																"org.dspace.app.webui.jsptag.ItemTag.restrict")
+												+ "</a>");
+								} catch (Exception e) {
+								}
+								out.print("</td></tr>");
             				}
             			}
             		}
@@ -1088,11 +1051,6 @@ public class ItemTag extends TagSupport
         showThumbs = ConfigurationManager
                 .getBooleanProperty("webui.item.thumbnail.show");
     }
-
-    private String requestCopyLink() throws SQLException {
-        return ConfigurationManager.getProperty(item.getHandle(), "request.copy.link");
-    }
-
 
     /**
      * Link to the item licence

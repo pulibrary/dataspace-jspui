@@ -417,7 +417,6 @@ public class BrowseListTag extends TagSupport
             }
 
             out.print("</tr>");
-            // end header
 
             // now output each item row
             for (int i = 0; i < items.length; i++)
@@ -488,17 +487,13 @@ public class BrowseListTag extends TagSupport
                     {
                         metadata = UIUtil.getMarkingMarkup(hrq, items[i], field);
                     }
-                    else if (metadataArray.length > 0 && null != metadataArray[0].value)
+                    else if (metadataArray.length > 0)
                     {
                         // format the date field correctly
                         if (isDate[colIdx])
                         {
-                            try {
-                                DCDate dd = new DCDate(metadataArray[0].value);
-                                metadata = UIUtil.displayDate(dd, false, false, hrq);
-                            } catch (NullPointerException e) {
-                                metadata = "Undated";
-                            }
+                            DCDate dd = new DCDate(metadataArray[0].value);
+                            metadata = UIUtil.displayDate(dd, false, false, hrq);
                         }
                         // format the title field correctly for withdrawn and private items (ie. don't link)
                         else if (field.equals(titleField) && items[i].isWithdrawn())

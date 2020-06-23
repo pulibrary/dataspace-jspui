@@ -119,9 +119,9 @@
 <dspace:layout titlekey="browse.page-title">
 
 	<%-- Build the header (careful use of spacing) --%>
-	<h3>
+	<h2>
 		<fmt:message key="browse.single.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message key="<%= typeKey %>"/>
-	</h3>
+	</h2>
 	
 <%
 	if (!bix.isTagCloudEnabled())
