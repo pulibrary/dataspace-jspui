@@ -718,4 +718,53 @@ public class DiscoverUtility
         }
         return appliedFilters;
     }
+
+    // /**
+    // * Build the query from the advanced search form
+    // *
+    // * @param request
+    // * @return
+    // */
+    // public static String buildQuery(HttpServletRequest request)
+    // {
+    // int num_field = UIUtil.getIntParameter(request, "num_search_field");
+    // if (num_field <= 0)
+    // {
+    // num_field = 3;
+    // }
+    // StringBuffer query = new StringBuffer();
+    // buildQueryPart(query, request.getParameter("field"),
+    // request.getParameter("query"), null);
+    // for (int i = 1; i < num_field; i++)
+    // {
+    // buildQueryPart(query, request.getParameter("field" + i),
+    // request.getParameter("query" + i),
+    // request.getParameter("conjuction" + i));
+    // }
+    // return query.toString();
+    // }
+    //
+    // private static void buildQueryPart(StringBuffer currQuery, String field,
+    // String queryPart, String conjuction)
+    // {
+    // if (StringUtils.isBlank(queryPart))
+    // {
+    // return;
+    // }
+    // else
+    // {
+    // StringBuffer tmp = new StringBuffer(queryPart);
+    // if (StringUtils.isNotBlank(field))
+    // {
+    // tmp.insert(0, field + ":(").append(")");
+    // }
+    //
+    // if (StringUtils.isNotBlank(conjuction) && currQuery.length() > 0)
+    // {
+    // currQuery.append(conjuction);
+    // }
+    // currQuery.append(tmp);
+    // }
+    // }
+
 }

@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>5.5</version>
+      <version>5.5-SNAPSHOT</version>
       <relativePath>./dspace-parent/dspace-5.5-src-release</relativePath>
    </parent>
 
@@ -99,6 +99,10 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>edu.princeton.dspace</groupId>
+            <artifactId>dspace-api-pu</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>

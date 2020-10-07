@@ -35,6 +35,9 @@
     String navbarNetid = null;
     if (user != null) {
         navbarNetid = user.getNetid();
+        if (navbarNetid == null) {
+          navbarNetid = user.getEmail();
+        }
     }
 
     // Is the logged in user an admin
@@ -126,7 +129,11 @@
                     <fmt:param><%= StringUtils.abbreviate(navbarNetid, 20) %>
                     </fmt:param>
                 </fmt:message> <b class="caret"></b></a>
-                <% } %>
+                <%
+    } else {
+                %>
+             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>
+        <% } %>
                 <ul class="dropdown-menu">
                     <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message
                             key="jsp.layout.navbar-default.users"/></a></li>
@@ -154,4 +161,3 @@
 
 
 </nav>
-
